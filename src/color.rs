@@ -57,14 +57,14 @@ impl Color {
     pub const fn palette256(index: u8) -> Self {
         // 6x6x6 color cube starting at index 16.
         if index >= 16 && index < 232 {
-            let v = index - 16;
+            let v = (index - 16) as usize;
             let r = (v / 36) % 6;
             let g = (v / 6) % 6;
             let b = v % 6;
             Self::rgb(
-                55 * r + (if r > 0 { 40 } else { 0 }),
-                55 * g + (if g > 0 { 40 } else { 0 }),
-                55 * b + (if b > 0 { 40 } else { 0 }),
+                (if r > 0 { 55 * r + 40 } else { 0 }) as u8,
+                (if g > 0 { 55 * g + 40 } else { 0 }) as u8,
+                (if b > 0 { 55 * b + 40 } else { 0 }) as u8,
             )
         } else if index >= 232 {
             let gray = 8 + (index - 232) * 10;

@@ -62,6 +62,19 @@ impl std::ops::BitAnd for Attr {
     }
 }
 
+impl std::ops::BitAndAssign for Attr {
+    fn bitand_assign(&mut self, rhs: Self) {
+        self.0 &= rhs.0;
+    }
+}
+
+impl std::ops::Not for Attr {
+    type Output = Self;
+    fn not(self) -> Self {
+        Self(!self.0)
+    }
+}
+
 /// A complete text style: foreground color, background color, and attributes.
 ///
 /// `Color::TRANSPARENT` is used as a sentinel meaning "inherit from parent /

@@ -88,6 +88,7 @@
     clippy::let_underscore_untyped
 )]
 
+pub mod ansi;
 pub mod backend;
 pub mod buffer;
 pub mod cell;
