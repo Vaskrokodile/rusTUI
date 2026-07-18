@@ -1,5 +1,9 @@
 # RusTUI
 
+![CI](https://github.com/Vaskrokodile/rusTUI/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Rust](https://img.shields.io/badge/rust-1.80%2B-orange.svg)
+
 An opinionated TUI toolkit for building **agentic coding harnesses** in Rust.
 
 RusTUI sits one layer above a raw rendering engine: it gives you a
