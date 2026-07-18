@@ -27,6 +27,10 @@ logs, status lines, and spinners.
   re-emitted each frame.
 - **Immediate-mode widgets.** Build a fresh widget tree each frame; persistent
   state lives in `Context::state`, not in widgets.
+- **Unicode-aware.** Grapheme cluster segmentation and display width via
+  `unicode-segmentation` and `unicode-width`.
+- **ANSI color parsing.** Built-in ANSI escape sequence parser for rendering
+  colored output from external processes.
 
 ## Architecture
 
@@ -35,14 +39,58 @@ your agent harness
         │
 agent widgets: StreamingText, ToolCallPanel, DiffViewer, MessageList, StatusLine
         │
-base widgets: Text, Flex, Box, List, Input, Spinner
+content widgets: Markdown, Table, Tree, Tabs, CommandPalette, Modal, Dialog
+        │
+base widgets: Text, Flex, Box, List, Input, TextArea, Block, Scrollable, Gauge, Spinner, Toast
         │
 layout (taffy)  │  renderer (double-buffered, diffed)
         │
-buffer / cell / style / color  (core primitives)
+buffer / cell / style / color / ansi  (core primitives)
         │
 Backend trait  ←  crossterm | termion | custom
 ```
+
+## Widgets
+
+### Base Widgets
+- **Block** — bordered container with titles, multiple border styles
+- **Text** — styled text with foreground/background colors
+- **Flex** — horizontal/vertical flexbox layout
+- **Box** — simple container
+- **List** — selectable list of items
+- **Input** — single-line text input with cursor
+- **TextArea** — multi-line text input with cursor movement
+- **Scrollable** — scrollable container with scrollbar
+- **Gauge** — progress bar (horizontal and line gauge)
+- **Spinner** — animated loading indicator
+- **Paragraph** — multi-line text with wrapping and alignment
+
+### Content Widgets
+- **Markdown** — renders markdown with headings, bold, italic, code blocks, lists, blockquotes, links
+- **Table** — tabular data with column widths, headers, row selection
+- **Tree** — hierarchical collapsible tree view
+- **Tabs** — tabbed panel switching
+- **CommandPalette** — fuzzy-searchable command menu
+- **Modal** — overlay dialog container
+- **Dialog** — simple yes/no/confirm dialog
+- **Toast** — transient notification overlays (info/success/warning/error)
+
+### Agent Widgets
+- **StreamingText** — LLM token streaming display
+- **ToolCallPanel** — tool call visualization with status
+- **DiffViewer** — unified diff rendering
+- **MessageList** — chat message history
+- **StatusLine** — bottom status bar
+
+## Systems
+
+- **Theme** — color presets and syntax token colors (DARK, LIGHT, DRACULA, etc.)
+- **Keybindings** — configurable key binding maps with emacs/vim presets
+- **Focus** — focus management for widget traversal
+- **Syntax highlighting** — `syntect` backend (feature-gated) with simple fallback
+- **ANSI parsing** — parse and render ANSI color codes
+- **Word wrapping** — Unicode-aware word-aware text wrapping
+- **Snapshot testing** — buffer comparison utilities for testing
 
 ## Quick start
 
@@ -68,14 +116,30 @@ fn main() -> rustui::Result<()> {
 }
 ```
 
-See `examples/agent_demo.rs` for a fuller example with streaming text, a
-tool-call panel, a diff viewer, and a status line.
+## Examples
+
+- `cargo run --example hello` — minimal hello world
+- `cargo run --example agent_demo` — streaming text + tool calls + diff viewer
+- `cargo run --example agent_harness` — comprehensive demo with all widgets:
+  message list, streaming, markdown, tabs, tree, command palette, modal, toast,
+  gauge, and focus management
 
 ## Feature flags
 
 - `backend-crossterm` (default): reference backend using `crossterm`.
 - `agent-full`: pulls in markdown + syntax highlighting for rich agent output.
 - `syntax-highlight`: `syntect`-backed syntax highlighting for code/diff blocks.
+
+## Testing
+
+```bash
+cargo test              # run all tests
+cargo clippy -- -D warnings  # lint
+cargo bench             # run benchmarks (criterion)
+```
+
+The library includes snapshot testing utilities (`assert_buffer`,
+`render_buffer`) for verifying widget rendering output.
 
 ## License
 
