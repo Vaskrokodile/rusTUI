@@ -100,6 +100,7 @@ pub mod layout;
 pub mod renderer;
 pub mod style;
 pub mod text;
+pub mod theme;
 pub mod unicode;
 pub mod wrap;
 
@@ -120,9 +121,13 @@ pub use layout::{Align, FlexDirection, FlexProps, Justify, LayoutNode, LayoutTre
 pub use renderer::Renderer;
 pub use style::Style;
 pub use text::{Span, Spans};
+pub use theme::{SyntaxTokenType, Theme};
 pub use unicode::{grapheme_width, graphemes};
 
-pub use widgets::{Box as WidgetBox, Flex, Input, List, ListItem, Spinner, SpinnerStyle, Text};
+pub use widgets::{
+    scrollbar_thumb, Block, BorderType, Box as WidgetBox, Flex, Input, List, ListItem, Paragraph,
+    Scrollable, Spinner, SpinnerStyle, Text,
+};
 
 pub use agent::{
     DiffHunk, DiffLine, DiffLineKind, DiffViewer, Message, MessageList, MessageRole, StatusLine,
