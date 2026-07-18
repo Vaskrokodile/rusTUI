@@ -117,7 +117,7 @@ impl Style {
     /// Set the text attributes.
     #[must_use]
     pub const fn attr(mut self, a: Attr) -> Self {
-        self.attr = a;
+        self.attr = Attr(self.attr.0 | a.0);
         self
     }
 
