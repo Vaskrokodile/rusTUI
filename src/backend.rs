@@ -108,8 +108,13 @@ impl Backend for Box<dyn Backend> {
 #[cfg(feature = "backend-crossterm")]
 pub mod crossterm_impl;
 
+/// Headless backend for testing (always available, no dependencies).
+pub mod headless;
+
 #[cfg(feature = "backend-crossterm")]
 pub use crossterm_impl::CrosstermBackend;
+
+pub use headless::HeadlessBackend;
 
 /// Construct the default backend for the current feature set.
 #[cfg(feature = "backend-crossterm")]
@@ -118,6 +123,8 @@ pub fn default_backend() -> CrosstermBackend {
 }
 
 #[cfg(not(feature = "backend-crossterm"))]
+/// Construct the default backend. Panics if no backend feature is enabled —
+/// enable `backend-crossterm` or supply your own via [`AppBuilder::backend`].
 pub fn default_backend() -> Box<dyn Backend> {
     panic!("no default backend compiled in; enable `backend-crossterm` or supply your own");
 }

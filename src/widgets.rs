@@ -3,7 +3,7 @@
 //! These are deliberately small and composable. Agent-specific widgets live
 //! in [`crate::agent`].
 
-pub(crate) mod base;
+pub mod base;
 pub(crate) mod box_widget;
 pub(crate) mod input;
 pub(crate) mod list;

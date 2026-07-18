@@ -5,6 +5,7 @@
 //! renderer; you supply a closure that builds a widget tree each frame and
 //! optionally reacts to events.
 
+use std::collections::VecDeque;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -129,6 +130,9 @@ impl AppBuilder {
             frame_budget: self.frame_budget,
             poll_timeout: self.poll_timeout,
             start: Instant::now(),
+            sender: EventSender {
+                inner: Arc::new(Mutex::new(VecDeque::new())),
+            },
         }
     }
 }
@@ -148,6 +152,7 @@ pub struct App {
     frame_budget: Duration,
     poll_timeout: Duration,
     start: Instant,
+    sender: EventSender,
 }
 
 impl Default for App {
@@ -160,6 +165,15 @@ impl App {
     /// Construct a builder for customizing the app.
     pub fn builder() -> AppBuilder {
         AppBuilder::new()
+    }
+
+    /// Get a clone of the [`EventSender`] for this app. Use it to inject
+    /// events from other tasks (e.g. an async LLM stream producing tokens).
+    ///
+    /// Events sent through the handle are surfaced as [`Event::User`] on
+    /// future frames, one per frame in FIFO order.
+    pub fn event_sender(&self) -> EventSender {
+        self.sender.clone()
     }
 
     /// Run the event loop. `render` is called each frame with a fresh
@@ -214,6 +228,7 @@ impl App {
             let event = self.backend.poll(poll_ms)?;
 
             // Determine which event to surface this frame.
+            // Priority: backend event > wakeup > user-injected event.
             let surfaced_event = if let Some(ev) = event {
                 Some(ev)
             } else if let Some(wu) = next_wakeup {
@@ -223,7 +238,7 @@ impl App {
                     None
                 }
             } else {
-                None
+                self.sender.drain_one()
             };
 
             let elapsed = self.start.elapsed();
@@ -280,18 +295,44 @@ impl App {
 /// A handle for sending events into an [`App`] from other tasks (e.g. an
 /// async LLM stream producing tokens).
 ///
-/// Construct via [`App::spawner`] inside the render closure; the handle is
-/// cheap to clone. Events sent through it are surfaced as [`Event::User`] on
-/// the next frame.
+/// Construct via [`App::event_sender`] before calling [`App::run`]. The handle
+/// is cheap to clone (`Arc`-backed). Events sent through it are drained and
+/// surfaced on subsequent frames — one [`Event::User`] per sent item, in
+/// order. If multiple events are sent between frames, they are surfaced one
+/// per frame in FIFO order.
 #[derive(Clone)]
 pub struct EventSender {
-    inner: Arc<Mutex<Option<Event>>>,
+    inner: Arc<Mutex<VecDeque<Event>>>,
 }
 
 impl EventSender {
-    /// Send a user event. Only the most recently sent event is surfaced each
-    /// frame; if you need a queue, wrap your own channel.
+    /// Construct a standalone `EventSender` (useful for tests). Normally you
+    /// get one via [`App::event_sender`].
+    pub fn new() -> Self {
+        Self {
+            inner: Arc::new(Mutex::new(VecDeque::new())),
+        }
+    }
+
+    /// Send a user event to be surfaced on a future frame.
     pub fn send(&self, event: Event) {
-        *self.inner.lock() = Some(event);
+        self.inner.lock().push_back(event);
+    }
+
+    /// Try to receive one pending event (FIFO). Returns `None` if the queue
+    /// is empty. This is what the [`App`] event loop calls each frame; you
+    /// usually don't need to call it yourself.
+    pub fn try_recv(&self) -> Option<Event> {
+        self.inner.lock().pop_front()
+    }
+
+    fn drain_one(&self) -> Option<Event> {
+        self.try_recv()
+    }
+}
+
+impl Default for EventSender {
+    fn default() -> Self {
+        Self::new()
     }
 }

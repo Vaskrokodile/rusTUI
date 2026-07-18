@@ -107,14 +107,14 @@ pub mod widgets;
 /// Widgets purpose-built for agentic coding harnesses.
 pub mod agent;
 
-pub use app::{App, AppBuilder, Context};
-pub use backend::Backend;
-pub use buffer::Buffer;
+pub use app::{App, AppBuilder, Context, EventSender};
+pub use backend::{Backend, HeadlessBackend};
+pub use buffer::{Buffer, Rect};
 pub use cell::Cell;
 pub use color::Color;
 pub use error::{Error, Result};
-pub use event::Event;
-pub use layout::{Align, FlexDirection, FlexProps, Justify, Length};
+pub use event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
+pub use layout::{Align, FlexDirection, FlexProps, Justify, LayoutNode, LayoutTree, Length};
 pub use renderer::Renderer;
 pub use style::Style;
 pub use text::{Span, Spans};

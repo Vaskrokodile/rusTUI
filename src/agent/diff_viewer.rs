@@ -99,24 +99,34 @@ impl DiffViewer {
     }
 
     /// Parse a unified diff string into hunks.
+    ///
+    /// File headers (`---`/`+++`) are attached to the hunk that follows them.
+    /// If a diff has file headers before any hunk, they become the first lines
+    /// of the first hunk.
     pub fn parse(diff: &str) -> Self {
         let mut hunks: Vec<DiffHunk> = Vec::new();
         let mut current: Option<DiffHunk> = None;
+        // Buffer file headers that appear before the first hunk.
+        let mut pending_file_headers: Vec<DiffLine> = Vec::new();
         for line in diff.lines() {
             if line.starts_with("@@") {
                 if let Some(h) = current.take() {
                     hunks.push(h);
                 }
                 let mut h = DiffHunk::new();
+                // Attach any pending file headers to this hunk.
+                for fh in pending_file_headers.drain(..) {
+                    h.push(fh);
+                }
                 h.push(DiffLine::new(DiffLineKind::Hunk, line));
                 current = Some(h);
             } else if line.starts_with("+++") || line.starts_with("---") {
+                let file_line = DiffLine::new(DiffLineKind::File, line);
                 if let Some(h) = current.as_mut() {
-                    h.push(DiffLine::new(DiffLineKind::File, line));
+                    h.push(file_line);
                 } else {
-                    let mut h = DiffHunk::new();
-                    h.push(DiffLine::new(DiffLineKind::File, line));
-                    current = Some(h);
+                    // Buffer until we see a hunk header.
+                    pending_file_headers.push(file_line);
                 }
             } else if let Some(h) = current.as_mut() {
                 let (kind, content) = if let Some(rest) = line.strip_prefix('+') {
