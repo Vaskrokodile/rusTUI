@@ -101,6 +101,7 @@ pub mod keybindings;
 pub mod layout;
 pub mod renderer;
 pub mod style;
+pub mod syntax;
 pub mod text;
 pub mod theme;
 pub mod unicode;
