@@ -130,9 +130,9 @@ pub use unicode::{grapheme_width, graphemes};
 
 pub use widgets::{
     scrollbar_thumb, Block, BorderType, Box as WidgetBox, Command, CommandPalette, CursorPos,
-    Dialog, Flex, Gauge, Input, LineGauge, List, ListItem, Modal, Paragraph, Scrollable, Spinner,
-    SpinnerStyle, Table, Tabs, Text, TextArea, Toast, ToastLevel, ToastPosition, ToastStack, Tree,
-    TreeNode,
+    Dialog, Flex, Gauge, Input, LineGauge, List, ListItem, Markdown, Modal, Paragraph, Scrollable,
+    Spinner, SpinnerStyle, Table, Tabs, Text, TextArea, Toast, ToastLevel, ToastPosition,
+    ToastStack, Tree, TreeNode,
 };
 
 pub use agent::{
