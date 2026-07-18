@@ -1,0 +1,64 @@
+[package]
+name = "rustui"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+authors = ["RusTUI contributors"]
+license = "MIT"
+description = "An opinionated TUI toolkit for building agentic coding harnesses in Rust."
+repository = "https://github.com/kzrr/RusTUI"
+readme = "README.md"
+keywords = ["tui", "terminal", "cli", "agent", "llm"]
+categories = ["command-line-interface", "command-line-utilities", "gui"]
+
+[lib]
+name = "rustui"
+path = "src/lib.rs"
+
+[features]
+default = ["backend-crossterm"]
+# Reference backend implementations. Disable both for a fully backend-agnostic build.
+backend-crossterm = ["dep:crossterm"]
+# Convenience feature: pulls in markdown + syntax highlighting for agent output.
+agent-full = ["markdown", "syntax-highlight"]
+# Optional syntax highlighting for diff/code blocks.
+syntax-highlight = ["dep:syntect"]
+
+[dependencies]
+# Core async runtime.
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+
+# Flexbox layout (Yoga-compatible).
+taffy = "0.7"
+
+# Unicode handling (grapheme clusters, width).
+unicode-width = "0.2"
+unicode-segmentation = "1.11"
+
+# Small, zero-dep utilities.
+compact_str = "0.8"
+smallvec = "1.13"
+parking_lot = "0.12"
+
+# Optional: backend implementation.
+crossterm = { version = "0.28", optional = true, features = ["event-stream"] }
+
+# Optional: agent-feature deps.
+markdown = { version = "0.3", optional = true }
+syntect = { version = "5.2", optional = true, default-features = false, features = ["default-fancy"] }
+
+# Error handling.
+thiserror = "1"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full", "test-util"] }
+
+[[example]]
+name = "hello"
+path = "examples/hello.rs"
+
+[[example]]
+name = "agent_demo"
+path = "examples/agent_demo.rs"
+required-features = ["backend-crossterm"]
