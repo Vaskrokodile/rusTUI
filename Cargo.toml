@@ -53,6 +53,11 @@ thiserror = "1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full", "test-util"] }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "rendering"
+harness = false
 
 [[example]]
 name = "hello"
@@ -61,4 +66,9 @@ path = "examples/hello.rs"
 [[example]]
 name = "agent_demo"
 path = "examples/agent_demo.rs"
+required-features = ["backend-crossterm"]
+
+[[example]]
+name = "agent_harness"
+path = "examples/agent_harness.rs"
 required-features = ["backend-crossterm"]
