@@ -125,8 +125,8 @@ pub use theme::{SyntaxTokenType, Theme};
 pub use unicode::{grapheme_width, graphemes};
 
 pub use widgets::{
-    scrollbar_thumb, Block, BorderType, Box as WidgetBox, Flex, Input, List, ListItem, Paragraph,
-    Scrollable, Spinner, SpinnerStyle, Text,
+    scrollbar_thumb, Block, BorderType, Box as WidgetBox, Flex, Gauge, Input, LineGauge, List,
+    ListItem, Paragraph, Scrollable, Spinner, SpinnerStyle, Tabs, Text,
 };
 
 pub use agent::{
