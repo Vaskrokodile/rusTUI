@@ -28,7 +28,7 @@ pub enum BorderType {
 impl BorderType {
     /// The seven glyph pieces for this border type, in the order:
     /// top-left, top, top-right, side, bottom-left, bottom, bottom-right.
-    const fn pieces(self) -> [&'static str; 7] {
+    pub(crate) const fn pieces(self) -> [&'static str; 7] {
         match self {
             BorderType::Plain => ["┌", "─", "┐", "│", "└", "─", "┘"],
             BorderType::Rounded => ["╭", "─", "╮", "│", "╰", "─", "╯"],

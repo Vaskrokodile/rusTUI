@@ -95,7 +95,9 @@ pub mod cell;
 pub mod color;
 pub mod error;
 pub mod event;
+pub mod focus;
 pub mod input;
+pub mod keybindings;
 pub mod layout;
 pub mod renderer;
 pub mod style;
@@ -117,6 +119,8 @@ pub use cell::Cell;
 pub use color::Color;
 pub use error::{Error, Result};
 pub use event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
+pub use focus::{FocusManager, FocusState};
+pub use keybindings::{KeyBinding, KeyBindings};
 pub use layout::{Align, FlexDirection, FlexProps, Justify, LayoutNode, LayoutTree, Length};
 pub use renderer::Renderer;
 pub use style::Style;
@@ -125,9 +129,10 @@ pub use theme::{SyntaxTokenType, Theme};
 pub use unicode::{grapheme_width, graphemes};
 
 pub use widgets::{
-    scrollbar_thumb, Block, BorderType, Box as WidgetBox, Command, CommandPalette, Dialog, Flex,
-    Gauge, Input, LineGauge, List, ListItem, Modal, Paragraph, Scrollable, Spinner, SpinnerStyle,
-    Table, Tabs, Text, Toast, ToastLevel, ToastPosition, ToastStack, Tree, TreeNode,
+    scrollbar_thumb, Block, BorderType, Box as WidgetBox, Command, CommandPalette, CursorPos,
+    Dialog, Flex, Gauge, Input, LineGauge, List, ListItem, Modal, Paragraph, Scrollable, Spinner,
+    SpinnerStyle, Table, Tabs, Text, TextArea, Toast, ToastLevel, ToastPosition, ToastStack, Tree,
+    TreeNode,
 };
 
 pub use agent::{

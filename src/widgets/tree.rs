@@ -209,27 +209,24 @@ impl Widget for Tree {
             if row >= max_row {
                 break;
             }
-            let is_selected = self.selected.first() == Some(&i);
-            row = paint_node(
-                ctx,
-                root,
-                x,
-                row,
-                w,
-                max_row,
-                0,
-                self,
-                if is_selected {
-                    &self.selected[1..]
-                } else {
-                    &[]
-                },
-            );
+            // `Some(path)` means this root is on the selected path; `None`
+            // means it is not. An empty path inside `Some` marks the selected
+            // node itself.
+            let path: Option<&[usize]> = if self.selected.first() == Some(&i) {
+                Some(&self.selected[1..])
+            } else {
+                None
+            };
+            row = paint_node(ctx, root, x, row, w, max_row, 0, self, path);
         }
     }
 }
 
 /// Recursively paint a single node and (if expanded) its children.
+///
+/// `remaining_path` is `Some(slice)` when this node lies on the selected path;
+/// an empty slice inside `Some` means *this* node is the selected one. `None`
+/// means the node is not on the selected path.
 ///
 /// Returns the next available row after painting this subtree.
 #[allow(clippy::too_many_arguments)]
@@ -242,7 +239,7 @@ fn paint_node(
     max_row: u16,
     level: u16,
     tree: &Tree,
-    remaining_path: &[usize],
+    remaining_path: Option<&[usize]>,
 ) -> u16 {
     if row >= max_row {
         return row;
@@ -253,7 +250,7 @@ fn paint_node(
     let mut cx = row_start;
 
     // Determine whether this node is the selected one.
-    let is_selected = remaining_path.is_empty();
+    let is_selected = remaining_path == Some(&[]);
     let base = if is_selected {
         tree.selected_style
     } else {
@@ -294,12 +291,11 @@ fn paint_node(
             if next_row >= max_row {
                 break;
             }
-            let child_path = if remaining_path.is_empty() {
-                &[]
-            } else if remaining_path.first() == Some(&i) {
-                &remaining_path[1..]
-            } else {
-                &[]
+            // Compute the child's remaining path: only children on the selected
+            // path receive `Some`.
+            let child_path = match remaining_path {
+                Some(path) if path.first() == Some(&i) => Some(&path[1..]),
+                _ => None,
             };
             next_row = paint_node(
                 ctx,
@@ -422,5 +418,23 @@ mod tests {
         assert_eq!(buf.cell(0, 1).unwrap().style.bg, Color::BLUE);
         // The first root (row 0) should not.
         assert_ne!(buf.cell(0, 0).unwrap().style.bg, Color::BLUE);
+    }
+
+    #[test]
+    fn nested_selected_node_is_highlighted() {
+        let tree = Tree::new().root(
+            TreeNode::new("dir")
+                .expanded(true)
+                .add_child(TreeNode::leaf("a.txt"))
+                .add_child(TreeNode::leaf("b.txt")),
+        );
+        // Select "b.txt": root 0, child 1.
+        let buf = paint_widget(&tree.selected([0, 1]), 20, 5);
+        // Row 0 is "dir" (not selected).
+        assert_ne!(buf.cell(0, 0).unwrap().style.bg, Color::BLUE);
+        // Row 2 is "b.txt" (selected): indented leaf icon at col 2.
+        assert_eq!(buf.cell(2, 2).unwrap().style.bg, Color::BLUE);
+        // Row 1 is "a.txt" (not selected).
+        assert_ne!(buf.cell(2, 1).unwrap().style.bg, Color::BLUE);
     }
 }

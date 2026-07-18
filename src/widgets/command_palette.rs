@@ -273,9 +273,9 @@ fn fuzzy_score(query: &str, target: &str) -> i32 {
     let mut score = 0i32;
     let mut query_chars = query.chars().peekable();
     let mut prev_matched = false;
-    let mut pos = 0u32;
+    let target_chars: Vec<char> = target.chars().collect();
 
-    for target_ch in target.chars() {
+    for (pos, &target_ch) in target_chars.iter().enumerate() {
         if let Some(&query_ch) = query_chars.peek() {
             if query_ch == target_ch {
                 score += 10;
@@ -284,7 +284,7 @@ fn fuzzy_score(query: &str, target: &str) -> i32 {
                     score += 15;
                 }
                 // Bonus for word boundary matches.
-                if pos == 0 || target.chars().nth(pos as usize - 1) == Some(' ') {
+                if pos == 0 || target_chars.get(pos - 1) == Some(&' ') {
                     score += 20;
                 }
                 prev_matched = true;
@@ -293,7 +293,6 @@ fn fuzzy_score(query: &str, target: &str) -> i32 {
                 prev_matched = false;
             }
         }
-        pos += 1;
     }
 
     // Penalty for length difference.

@@ -165,8 +165,7 @@ impl Toast {
         let title_w = self
             .title
             .as_ref()
-            .map(|t| crate::unicode::str_width(t) as u16)
-            .unwrap_or(0);
+            .map_or(0, |t| crate::unicode::str_width(t) as u16);
         let icon_w = if self.show_icon { 2 } else { 0 }; // icon + space
         let content_w = msg_w.max(title_w) + icon_w + self.padding * 2;
         let width = content_w.min(self.max_width).min(viewport.w);
@@ -360,7 +359,7 @@ mod tests {
         let toast = Toast::info("File saved");
         let buf = paint_widget(&toast, 60, 20);
         // Should have some content (border or text).
-        let has_content = (0..60).any(|x| buf.cell(x, 1).map(|c| !c.is_blank()).unwrap_or(false));
+        let has_content = (0..60).any(|x| buf.cell(x, 1).is_some_and(|c| !c.is_blank()));
         assert!(has_content);
     }
 
