@@ -101,6 +101,7 @@ pub mod renderer;
 pub mod style;
 pub mod text;
 pub mod unicode;
+pub mod wrap;
 
 pub mod app;
 pub mod widgets;
