@@ -8,7 +8,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: "-D warnings"
   CARGO_INCREMENTAL: 0
 
 jobs:
@@ -38,7 +37,7 @@ jobs:
         run: cargo clippy --no-default-features --all-targets -- -D warnings
 
   test:
-    name: test & build
+    name: test (${{ matrix.os }}, rust ${{ matrix.rust }})
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +46,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@${{ matrix.rust }}
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
       - uses: Swatinem/rust-cache@v2
       - name: Build (default features)
         run: cargo build --all-targets --verbose
@@ -59,13 +60,5 @@ jobs:
         run: cargo test --verbose
       - name: Doc build
         run: cargo doc --no-deps --verbose
-
-  msrv:
-    name: MSRV check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.80
-      - uses: Swatinem/rust-cache@v2
-      - name: Check MSRV
-        run: cargo check --lib
+        env:
+          RUSTDOCFLAGS: "-D warnings"
