@@ -1,8 +1,8 @@
 //! Input parsing utilities.
 //!
 //! Most users don't need this — the [`crate::backend::Backend`] already
-//! returns parsed [`Event`]s. This module exists for backends that want to
-//! share a common parser, and for tests.
+//! returns parsed [`crate::event::Event`]s. This module exists for backends
+//! that want to share a common parser, and for tests.
 
 use crate::event::{KeyCode, KeyEvent, KeyModifiers};
 

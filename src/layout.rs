@@ -1,9 +1,9 @@
 //! Flexbox layout via `taffy`.
 //!
-//! Widgets declare a [`Style`] (flex direction, grow, shrink, basis, padding,
-//! margin, alignment) and a content size hint; the layout pass produces a
-//! [`Rect`] for every node. This is the same model OpenTUI uses (Yoga), just
-//! backed by `taffy` instead of the Zig Yoga bindings.
+//! Widgets declare a [`FlexProps`] (flex direction, grow, shrink, basis,
+//! padding, margin, alignment) and a content size hint; the layout pass
+//! produces a [`Rect`] for every node. This is the same model OpenTUI uses
+//! (Yoga), just backed by `taffy` instead of the Zig Yoga bindings.
 
 use crate::buffer::Rect;
 
